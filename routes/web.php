@@ -33,10 +33,15 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::prefix('artworks')->group(function () {
         Route::post('/', [ArtworkController::class, 'store']);
         Route::post('/images', [ArtworkController::class, 'upload']);
+        Route::get('/images/{id}', [ArtworkController::class, 'download']);
     });
 
     Route::prefix('posts')->group(function () {
         Route::post('/', [PostController::class, 'store']);
+        Route::get('/{id}', [PostController::class, 'show']);
+        Route::post('/like', [PostController::class, 'like']);
+        Route::get('/liked/{id}', [PostController::class, 'liked']);
+        Route::post('/comment', [PostController::class, 'comment']);
     });
 
     Route::prefix('genres')->group(function () {

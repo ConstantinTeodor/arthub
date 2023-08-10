@@ -4,8 +4,12 @@ namespace App\Services;
 
 use App\Models\Artwork;
 use App\Models\Genre;
+use App\Models\Post;
 use App\Models\Type;
+use Exception;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ArtworkService
 {
@@ -44,5 +48,28 @@ class ArtworkService
         $file->move(public_path('uploads'), $filename);
 
         return $filename;
+    }
+
+    /**
+     * @param int $post_id
+     * @return array
+     * @throws Exception
+     */
+    public function getImage(int $post_id): array
+    {
+        $post = Post::findOrFail($post_id);
+        $imagePath = public_path('uploads/' . $post->image_url);
+
+        if (file_exists($imagePath)) {
+            $fileContents = file_get_contents($imagePath);
+            $contentType = mime_content_type($imagePath);
+
+            return [
+                'image' => $fileContents,
+                'contentType' => $contentType
+            ];
+        } else {
+            throw new Exception('Not found', Response::HTTP_NOT_FOUND);
+        }
     }
 }

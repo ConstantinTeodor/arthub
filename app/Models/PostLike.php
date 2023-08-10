@@ -16,8 +16,6 @@ class PostLike extends Model
 
     protected $table = 'post_likes';
 
-    protected $primaryKey = ['client_id', 'post_id'];
-
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'client_id', 'id');
