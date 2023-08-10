@@ -24,7 +24,6 @@ class ClientService
     {
         if (Auth::check()) {
             $user = User::findOrFail(Auth::user()->id);
-            Log::debug($user);
         } else {
             throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }

@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ArtworkController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +30,20 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/', [ClientController::class, 'store']);
     });
 
-    Route::prefix('art')->group(function () {
+    Route::prefix('artworks')->group(function () {
         Route::post('/', [ArtworkController::class, 'store']);
+        Route::post('/images', [ArtworkController::class, 'upload']);
+    });
+
+    Route::prefix('posts')->group(function () {
+        Route::post('/', [PostController::class, 'store']);
+    });
+
+    Route::prefix('genres')->group(function () {
+        Route::get('/', [GenreController::class, 'index']);
+    });
+
+    Route::prefix('types')->group(function () {
+        Route::get('/', [TypeController::class, 'index']);
     });
 });

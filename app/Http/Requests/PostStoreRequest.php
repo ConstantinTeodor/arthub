@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ArtworkStoreRequest extends FormRequest
+class PostStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,9 @@ class ArtworkStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string',
-            'artist' => 'required|string',
-            'type' => 'required|string',
-            'genre' => 'required|string',
+            'artwork_id' => 'required|integer|exists:artworks,id',
+            'description' => 'required|string',
+            'image_url' => 'required|string',
         ];
     }
 }
