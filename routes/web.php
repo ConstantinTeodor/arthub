@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\ArtworkController;
+use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +44,19 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/like', [PostController::class, 'like']);
         Route::get('/liked/{id}', [PostController::class, 'liked']);
         Route::post('/comment', [PostController::class, 'comment']);
+        Route::post('/comment/like', [PostController::class, 'likeComment']);
+        Route::get('/comment/liked/{id}', [PostController::class, 'commentLiked']);
+        Route::delete('/comment/{id}', [PostController::class, 'deleteComment']);
+        Route::delete('/{id}', [PostController::class, 'deletePost']);
+        Route::post('/comment/edit', [PostController::class, 'editComment']);
+    });
+
+    Route::prefix('auctions')->group(function () {
+        Route::post('/', [AuctionController::class, 'store']);
+    });
+
+    Route::prefix('sales')->group(function () {
+        Route::post('/', [SaleController::class, 'store']);
     });
 
     Route::prefix('genres')->group(function () {

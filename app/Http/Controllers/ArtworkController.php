@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ArtworkStoreRequest;
+use App\Http\Requests\Artwork\ArtworkStoreRequest;
 use App\Services\ArtworkService;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -10,7 +10,6 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 class ArtworkController extends Controller
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Post;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +21,8 @@ class PostShowResource extends JsonResource
                 'username' => $comment->user->name,
                 'comment' => $comment->comment,
                 'posted_at' => $comment->created_at->format('d F, Y: H:i'),
+                'likes' => count($comment->likes),
+                'myComment' => $comment->myComment,
             ];
         }
 
@@ -34,6 +36,7 @@ class PostShowResource extends JsonResource
             'no_comments' => count($this->comments),
             "comments" => $postComments,
             'posted_at' => $this->created_at->format('d F, Y: H:i'),
+            'myPost' => $this->myPost,
         ];
     }
 }

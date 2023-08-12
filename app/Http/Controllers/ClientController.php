@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ClientStoreRequest;
+use App\Http\Requests\Client\ClientStoreRequest;
 use App\Services\ClientService;
 use Exception;
 use Illuminate\Http\JsonResponse;

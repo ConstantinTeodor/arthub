@@ -16,8 +16,6 @@ class PostCommentLike extends Model
 
     protected $table = 'post_comment_likes';
 
-    protected $primaryKey = ['client_id', 'comment_id'];
-
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'client_id', 'id');

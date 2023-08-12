@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserStoreRequest extends FormRequest
+class UserLoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,7 @@ class UserStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required|string',
-            'email' => 'required|string|unique:users,email',
-            'phone_number' => 'required|string',
+            'email' => 'required|string',
             'password' => 'required|string'
         ];
     }

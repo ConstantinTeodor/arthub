@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PostStoreCommentRequest;
-use App\Http\Requests\PostStoreRequest;
-use App\Http\Resources\PostShowResource;
+use App\Http\Requests\Post\PostCommentEditRequest;
+use App\Http\Requests\Post\PostStoreCommentRequest;
+use App\Http\Requests\Post\PostStoreRequest;
+use App\Http\Resources\Post\PostShowResource;
 use App\Services\PostService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -85,6 +86,78 @@ class PostController extends Controller
         try {
             $validatedData = $request->validated();
             $this->postService->addComment($validatedData);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function likeComment(Request $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validate([ 'comment_id' => 'required|integer' ]);
+            $this->postService->likeComment($validatedData);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function commentLiked(int $id): JsonResponse
+    {
+        try {
+            $liked = $this->postService->commentLiked($id);
+            return response()->json([ 'likedComment' => $liked ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function deleteComment(int $id): JsonResponse
+    {
+        try {
+            $this->postService->deleteComment($id);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function deletePost(int $id): JsonResponse
+    {
+        try {
+            $this->postService->deletePost($id);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param PostCommentEditRequest $request
+     * @return JsonResponse
+     */
+    public function editComment(PostCommentEditRequest $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validated();
+            $this->postService->editComment($validatedData);
             return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostStoreCommentRequest extends FormRequest
+class UserStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,10 @@ class PostStoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'post_id' => 'required|integer',
-            'comment' => 'required|string',
+            'username' => 'required|string',
+            'email' => 'required|string|unique:users,email',
+            'phone_number' => 'required|string',
+            'password' => 'required|string'
         ];
     }
 }
