@@ -34,8 +34,8 @@ class SaleService
         $sale = new Sale();
         $sale->client()->associate($client);
         $sale->artwork_id = $data['artwork_id'];
-        $sale->price = $data['price'];
-        $sale->quantity = $data['quantity'];
+        $sale->price = (float)$data['price'];
+        $sale->quantity = (int)$data['quantity'];
         $sale->save();
     }
 }

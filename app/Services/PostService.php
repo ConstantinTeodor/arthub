@@ -2,13 +2,18 @@
 
 namespace App\Services;
 
+use App\Models\Auction;
+use App\Models\Genre;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\PostCommentLike;
 use App\Models\PostLike;
+use App\Models\Sale;
+use App\Models\Type;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -65,6 +70,35 @@ class PostService
         $post = Post::findOrFail($post_id);
 
         $post->load('artwork');
+
+        $artworkGenres = $post->artwork->genres()->get();
+        if (!empty($artworkGenres)) {
+            $post->genres = $artworkGenres;
+        } else {
+            $post->genres = [];
+        }
+
+        $artworkTypes = $post->artwork->types()->get();
+        if (!empty($artworkTypes)) {
+            $post->types = $artworkTypes;
+        } else {
+            $post->types = [];
+        }
+
+        $artworkSales = Sale::where('artwork_id', '=', $post->artwork->id)->first();
+        if (empty($artworkSales)) {
+            $post->sale = [];
+        } else {
+            $post->sale = $artworkSales;
+        }
+
+        $artworkAuctions = Auction::where('artwork_id', '=', $post->artwork->id)->first();
+        if (empty($artworkAuctions)) {
+            $post->auction = [];
+        } else {
+            $post->auction = $artworkAuctions;
+        }
+
         $post->load('client');
         $post->user = $post->client->user;
         $post->myPost = $post->client->id === $client->id;
@@ -338,5 +372,138 @@ class PostService
         } else {
             throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
+    }
+
+    public function updatePost(array $data)
+    {
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+        } else {
+            throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+
+        $client = $user->client;
+
+        if (empty($client)) {
+            throw new Exception('Client not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $post = Post::findOrFail((int)$data['post_id']);
+
+        if ($data['title'] !== null || $data['artist'] !== null || $data['genre'] !== null || $data['type'] !== null) {
+            $artwork = $post->artwork;
+
+            if ($data['title'] !== null) {
+                $artwork->title = $data['title'];
+            }
+
+            if ($data['artist'] !== null) {
+                $artwork->artist = $data['artist'];
+            }
+
+            if ($data['genre'] !== null) {
+                $genres = $artwork->genres;
+                foreach ($genres as $genre) {
+                    $artwork->genres()->detach($genre->id);
+                }
+
+                foreach ($data['genre'] as $genre) {
+                    $genre = Genre::where('name', '=', $genre)->first();
+                    $artwork->genres()->attach($genre);
+                }
+            }
+
+            if ($data['type'] !== null) {
+                $types = $artwork->types;
+
+                foreach ($types as $type) {
+                    $artwork->types()->detach($type->id);
+                }
+
+                foreach ($data['type'] as $type) {
+                    $type = Type::where('name', '=', $type)->first();
+                    $artwork->types()->attach($type);
+                }
+            }
+
+            $artwork->save();
+
+            if ($data['sale_id'] !== null) {
+                if ((int)$data['sale_id'] == 0) {
+                    $sale = new Sale();
+                    $sale->artwork_id = $artwork->id;
+                    $sale->creator()->associate($client);
+                    $sale->quantity = (int)$data['quantity'] !== null ? (int)$data['quantity'] : null;
+                    $sale->price = (float)$data['price'] !== null ? (float)$data['price'] : null;
+                    $sale->save();
+                } else {
+                    if ((int)$data['sale_id'] == -1) {
+                        $sale = Sale::where('artwork_id', '=', $artwork->id)->first();
+                        if (!empty($sale)) {
+                            $sale->delete();
+                        }
+                    } else {
+                        $sale = Sale::findOrFail((int)$data['sale_id']);
+                        $sale->quantity = (int)$data['quantity'] !== null ? (int)$data['quantity'] : null;
+                        $sale->price = (float)$data['price'] !== null ? (float)$data['price'] : null;
+                        $sale->save();
+                    }
+                }
+
+            } else {
+                $sale = Sale::where('artwork_id', '=', $artwork->id)->first();
+                if (!empty($sale)) {
+                    $sale->delete();
+                }
+            }
+
+            if ($data['auction_id'] !== null) {
+                if ($data['auction_id'] == 0) {
+                    $auction = new Auction();
+                    $auction->artwork_id = $artwork->id;
+                    $auction->creator()->associate($client);
+                    $auction->name = $data['name'] !== null ? $data['name'] : null;
+                    $auction->start_date = $data['start_date'] !== null ? Carbon::parse($data['start_date'])->format('Y-m-d H:i:s') : null;
+                    $auction->end_date = $data['end_date'] !== null ? Carbon::parse($data['end_date'])->format('Y-m-d H:i:s') : null;
+                    $auction->start_bid = (float)$data['start_bid'] !== null ? (float)$data['start_bid'] : null;
+                    $auction->save();
+                } else {
+                    if ($data['auction_id'] == -1) {
+                        $auction = Auction::where('artwork_id', '=', $artwork->id)->first();
+                        if (!empty($auction)) {
+                            $auction->delete();
+                        }
+                    } else {
+                        $auction = Auction::findOrFail((int)$data['auction_id']);
+                        $auction->name = $data['name'] !== null ? $data['name'] : null;
+                        $auction->start_date = $data['start_date'] !== null ? Carbon::parse($data['start_date'])->format('Y-m-d H:i:s') : null;
+                        $auction->end_date = $data['end_date'] !== null ? Carbon::parse($data['end_date'])->format('Y-m-d H:i:s') : null;
+                        $auction->start_bid = (float)$data['start_bid'] !== null ? (float)$data['start_bid'] : null;
+                        $auction->save();
+                    }
+                }
+            } else {
+                $auction = Auction::where('artwork_id', '=', $artwork->id)->first();
+                if (!empty($auction)) {
+                    $auction->delete();
+                }
+            }
+        }
+
+        if ($data['description'] !== null) {
+            $post->description = $data['description'];
+        }
+
+        if ($data['image_url'] !== null) {
+            $imagePath = public_path('uploads/' . $post->image_url);
+
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+
+            $post->image_url = $data['image_url'];
+        }
+
+        $post->save();
     }
 }

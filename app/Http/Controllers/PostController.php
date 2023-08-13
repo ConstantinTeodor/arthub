@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Post\PostCommentEditRequest;
 use App\Http\Requests\Post\PostStoreCommentRequest;
 use App\Http\Requests\Post\PostStoreRequest;
+use App\Http\Requests\Post\PostUpdateRequest;
 use App\Http\Resources\Post\PostShowResource;
 use App\Services\PostService;
 use Exception;
@@ -158,6 +159,17 @@ class PostController extends Controller
         try {
             $validatedData = $request->validated();
             $this->postService->editComment($validatedData);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    public function update(PostUpdateRequest $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validated();
+            $this->postService->updatePost($validatedData);
             return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());

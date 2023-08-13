@@ -27,7 +27,7 @@ class AuctionStoreRequest extends FormRequest
             'name' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'start_bid' => 'required|float',
+            'start_bid' => 'required',
         ];
     }
 }

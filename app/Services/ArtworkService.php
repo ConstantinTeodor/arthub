@@ -8,8 +8,6 @@ use App\Models\Post;
 use App\Models\Type;
 use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class ArtworkService
 {
@@ -27,10 +25,15 @@ class ArtworkService
 
         $artwork->save();
 
-        $type = Type::where('name', '=', $data['type'])->first();
-        $artwork->types()->attach($type);
-        $genre = Genre::where('name', '=', $data['genre'])->first();
-        $artwork->genres()->attach($genre);
+        foreach ($data['type'] as $type) {
+            $type = Type::where('name', '=', $type)->first();
+            $artwork->types()->attach($type);
+        }
+
+        foreach ($data['genre'] as $genre) {
+            $genre = Genre::where('name', '=', $genre)->first();
+            $artwork->genres()->attach($genre);
+        }
 
         $artwork->save();
 

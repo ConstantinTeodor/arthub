@@ -25,8 +25,8 @@ class ArtworkStoreRequest extends FormRequest
         return [
             'title' => 'required|string',
             'artist' => 'required|string',
-            'type' => 'required|string',
-            'genre' => 'required|string',
+            'type' => 'required|array',
+            'genre' => 'required|array',
         ];
     }
 }

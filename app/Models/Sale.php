@@ -18,7 +18,7 @@ class Sale extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'artowrk_sales';
+    protected $table = 'artwork_sales';
 
     protected $primaryKey = 'id';
 

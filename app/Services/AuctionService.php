@@ -38,7 +38,7 @@ class AuctionService
         $auction->name = $data['name'];
         $auction->start_date = Carbon::parse($data['start_date'])->format('Y-m-d H:i:s');
         $auction->end_date = Carbon::parse($data['end_date'])->format('Y-m-d H:i:s');
-        $auction->start_bid = $data['start_bid'];
+        $auction->start_bid = (float)$data['start_bid'];
         $auction->save();
     }
 }

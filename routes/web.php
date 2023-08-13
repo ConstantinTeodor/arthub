@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::delete('/comment/{id}', [PostController::class, 'deleteComment']);
         Route::delete('/{id}', [PostController::class, 'deletePost']);
         Route::post('/comment/edit', [PostController::class, 'editComment']);
+        Route::put('/', [PostController::class, 'update']);
     });
 
     Route::prefix('auctions')->group(function () {

@@ -26,6 +26,44 @@ class PostShowResource extends JsonResource
             ];
         }
 
+        $saleData = [];
+
+        if ($this->sale !== []) {
+            $saleData = [
+                'id' => $this->sale->id,
+                'price' => $this->sale->price,
+                'quantity' => $this->sale->quantity,
+            ];
+        }
+
+        $auctionData = [];
+
+        if ($this->auction !== []) {
+            $auctionData = [
+                'id' => $this->auction->id,
+                'name' => $this->auction->name,
+                'start_date' => $this->auction->start_date,
+                'end_date' => $this->auction->end_date,
+                'start_bid' => $this->auction->start_bid,
+            ];
+        }
+
+        $genres = [];
+
+        foreach ($this->genres as $genre) {
+            $genres[] = [
+                $genre->name,
+            ];
+        }
+
+        $types = [];
+
+        foreach ($this->types as $type) {
+            $types[] = [
+                $type->name,
+            ];
+        }
+
         return [
             'id' => $this->id,
             'artwork_title' => $this->artwork->title,
@@ -37,6 +75,10 @@ class PostShowResource extends JsonResource
             "comments" => $postComments,
             'posted_at' => $this->created_at->format('d F, Y: H:i'),
             'myPost' => $this->myPost,
+            'sale' => $saleData !== [] ? $saleData : null,
+            'auction' => $auctionData !== [] ? $auctionData : null,
+            'genres' => $genres,
+            'types' => $types,
         ];
     }
 }

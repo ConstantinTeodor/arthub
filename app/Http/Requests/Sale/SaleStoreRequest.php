@@ -24,8 +24,8 @@ class SaleStoreRequest extends FormRequest
     {
         return [
             'artwork_id' => 'required|integer',
-            'price' => 'required|float',
-            'quantity' => 'required|integer',
+            'price' => 'required',
+            'quantity' => 'required',
         ];
     }
 }
