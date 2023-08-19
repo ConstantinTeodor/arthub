@@ -75,4 +75,12 @@ class ArtworkService
             throw new Exception('Not found', Response::HTTP_NOT_FOUND);
         }
     }
+
+    /**
+     * @return mixed
+     */
+    public function getArtists(): mixed
+    {
+        return Artwork::select('artist')->distinct()->get();
+    }
 }

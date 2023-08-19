@@ -60,4 +60,17 @@ class ArtworkController extends Controller
             return response()->json(['message' => $e->getMessage()], $e->getCode());
         }
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getArtists(): JsonResponse
+    {
+        try {
+            $artists = $this->artworkService->getArtists();
+            return response()->json(['message' => 'Success', 'artists' => $artists], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], $e->getCode());
+        }
+    }
 }

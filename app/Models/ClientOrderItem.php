@@ -19,8 +19,6 @@ class ClientOrderItem extends Model
 
     protected $table = 'client_order_items';
 
-    protected $primaryKey = ['client_order_id', 'artwork_id'];
-
     public function clientOrder(): BelongsTo
     {
         return $this->belongsTo(ClientOrder::class, 'client_order_id', 'id');

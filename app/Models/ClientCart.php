@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,15 +20,13 @@ class ClientCart extends Model
 
     protected $table = 'client_cart_items';
 
-    protected $primaryKey = ['client_id', 'artwork_id'];
-
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'client_id', 'id');
     }
 
-    public function artworks(): HasMany
+    public function artworks(): BelongsTo
     {
-        return $this->hasMany(Artwork::class, 'artwork_id', 'id');
+        return $this->belongsTo(Artwork::class, 'artwork_id', 'id');
     }
 }

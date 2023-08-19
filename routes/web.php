@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\ArtworkController;
 use App\Http\Controllers\AuctionController;
+use App\Http\Controllers\ClientCartController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientOrderController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SaleController;
@@ -30,12 +32,16 @@ Route::prefix('auth')->group(function () {
 Route::group(['middleware' => ['auth:api']], function () {
     Route::prefix('clients')->group(function () {
         Route::post('/', [ClientController::class, 'store']);
+        Route::get('/{id}', [ClientController::class, 'show']);
+        Route::get('/myAccount/myId', [ClientController::class, 'getMyId']);
+        Route::get('/checkout/userdata', [ClientController::class, 'getCheckoutData']);
     });
 
     Route::prefix('artworks')->group(function () {
         Route::post('/', [ArtworkController::class, 'store']);
         Route::post('/images', [ArtworkController::class, 'upload']);
         Route::get('/images/{id}', [ArtworkController::class, 'download']);
+        Route::get('/artists', [ArtworkController::class, 'getArtists']);
     });
 
     Route::prefix('posts')->group(function () {
@@ -58,6 +64,20 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::prefix('sales')->group(function () {
         Route::post('/', [SaleController::class, 'store']);
+        Route::get('/latest', [SaleController::class, 'latest']);
+        Route::post('/all', [SaleController::class, 'getFiltered']);
+    });
+
+    Route::prefix('cart')->group(function () {
+        Route::post('/', [ClientCartController::class, 'addToCart']);
+        Route::get('/', [ClientCartController::class, 'show']);
+        Route::delete('/{id}', [ClientCartController::class, 'delete']);
+        Route::put('/quantity', [ClientCartController::class, 'updateQuantity']);
+        Route::get('/total', [ClientCartController::class, 'getTotal']);
+    });
+
+    Route::prefix('/orders')->group(function () {
+        Route::post('/', [ClientOrderController::class, 'store']);
     });
 
     Route::prefix('genres')->group(function () {

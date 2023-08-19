@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $ordered_via
  * @property float $final_amount
  * @property string $payment
+ * @property string $address
  */
 class ClientOrder extends Model
 {
