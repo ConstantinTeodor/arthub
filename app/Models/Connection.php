@@ -18,8 +18,6 @@ class Connection extends Model
 
     protected $table = 'connections';
 
-    protected $primaryKey = ['requester_id', 'receiver_id'];
-
     public function requester(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'requester_id', 'id');

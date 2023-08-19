@@ -94,4 +94,16 @@ class ClientService
 
         return $client;
     }
+
+    public function search(string $query)
+    {
+        $clients = Client::join('users', 'users.client_id', '=', 'clients.id')
+            ->where('first_name', 'like', '%' . $query . '%')
+            ->orWhere('last_name', 'like', '%' . $query . '%')
+            ->orWhere('middle_name', 'like', '%' . $query . '%')
+            ->orWhere('name', 'like', '%' . $query . '%')
+            ->get();
+
+        return $clients;
+    }
 }

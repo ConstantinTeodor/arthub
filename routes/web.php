@@ -5,6 +5,7 @@ use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\ClientCartController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientOrderController;
+use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SaleController;
@@ -35,6 +36,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/{id}', [ClientController::class, 'show']);
         Route::get('/myAccount/myId', [ClientController::class, 'getMyId']);
         Route::get('/checkout/userdata', [ClientController::class, 'getCheckoutData']);
+        Route::get('/search/{string}', [ClientController::class, 'search']);
     });
 
     Route::prefix('artworks')->group(function () {
@@ -86,5 +88,12 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::prefix('types')->group(function () {
         Route::get('/', [TypeController::class, 'index']);
+    });
+
+    Route::prefix('connections')->group(function () {
+        Route::post('/', [ConnectionController::class, 'store']);
+        Route::get('/status/{receiver_id}', [ConnectionController::class, 'status']);
+        Route::delete('/{id}', [ConnectionController::class, 'destroy']);
+        Route::put('/', [ConnectionController::class, 'update']);
     });
 });

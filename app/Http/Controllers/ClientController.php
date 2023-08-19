@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Client\ClientStoreRequest;
 use App\Http\Resources\Client\ClientCheckoutResource;
+use App\Http\Resources\Client\ClientSearchResource;
 use App\Http\Resources\Client\ClientShowResource;
 use App\Services\ClientService;
 use Exception;
@@ -66,6 +67,20 @@ class ClientController extends Controller
         try {
             $checkoutData = $this->clientService->getCheckoutData();
             return new ClientCheckoutResource($checkoutData);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param string $query
+     * @return ClientSearchResource|JsonResponse
+     */
+    public function search(string $query): ClientSearchResource|JsonResponse
+    {
+        try {
+            $clients = $this->clientService->search($query);
+            return new ClientSearchResource(['data' => $clients]);
         } catch (Exception $e) {
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
         }
