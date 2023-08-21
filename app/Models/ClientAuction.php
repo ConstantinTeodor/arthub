@@ -19,8 +19,6 @@ class ClientAuction extends Model
 
     protected $table = 'client_auction';
 
-    protected $primaryKey = ['client_id', 'auction_id'];
-
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'client_id', 'id');

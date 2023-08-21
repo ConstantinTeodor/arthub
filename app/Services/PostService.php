@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Auction;
+use App\Models\Connection;
 use App\Models\Genre;
 use App\Models\Post;
 use App\Models\PostComment;
@@ -151,6 +152,8 @@ class PostService
         $postLike = PostLike::where('client_id', '=', $client->id)
             ->where('post_id', '=', $post->id)
             ->first();
+
+        Log::debug('Post like: ' . $postLike);
 
         if (!empty($postLike)) {
             Post::find($post->id)->likes()->detach($postLike->id);
@@ -505,5 +508,38 @@ class PostService
         }
 
         $post->save();
+    }
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public function feed(): mixed
+    {
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+        } else {
+            throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+
+        $client = $user->client;
+
+        if (empty($client)) {
+            throw new Exception('Client not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $connectionsSent = Connection::where('requester_id', '=', $client->id)
+            ->where('status', '=', 'accepted')
+            ->pluck('receiver_id');
+
+        $connectionsReceived = Connection::where('receiver_id', '=', $client->id)
+            ->where('status', '=', 'accepted')
+            ->pluck('requester_id');
+
+        return Post::where('client_id', '=', $client->id)
+            ->orWhereIn('client_id', $connectionsSent)
+            ->orWhereIn('client_id', $connectionsReceived)
+            ->orderBy('created_at', 'desc')
+            ->pluck('id');
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientOrderController;
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\TypeController;
@@ -58,10 +59,15 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::delete('/{id}', [PostController::class, 'deletePost']);
         Route::post('/comment/edit', [PostController::class, 'editComment']);
         Route::put('/', [PostController::class, 'update']);
+        Route::get('/feed/getIds', [PostController::class, 'feed']);
     });
 
     Route::prefix('auctions')->group(function () {
         Route::post('/', [AuctionController::class, 'store']);
+        Route::post('/filtered', [AuctionController::class, 'filtered']);
+        Route::get('/{id}', [AuctionController::class, 'show']);
+        Route::post('/participate', [AuctionController::class, 'participate']);
+        Route::post('/bid', [AuctionController::class, 'bid']);
     });
 
     Route::prefix('sales')->group(function () {
@@ -95,5 +101,11 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/status/{receiver_id}', [ConnectionController::class, 'status']);
         Route::delete('/{id}', [ConnectionController::class, 'destroy']);
         Route::put('/', [ConnectionController::class, 'update']);
+    });
+
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::post('/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/readAll', [NotificationController::class, 'readAll']);
     });
 });

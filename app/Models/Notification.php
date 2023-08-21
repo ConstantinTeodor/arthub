@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $client_id
+ * @property string $status
  * @property string $title
  * @property string $message
  * @property int $from_id

@@ -165,12 +165,29 @@ class PostController extends Controller
         }
     }
 
+    /**
+     * @param PostUpdateRequest $request
+     * @return JsonResponse
+     */
     public function update(PostUpdateRequest $request): JsonResponse
     {
         try {
             $validatedData = $request->validated();
             $this->postService->updatePost($validatedData);
             return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function feed(): JsonResponse
+    {
+        try {
+            $feed = $this->postService->feed();
+            return response()->json([ 'feed' => $feed ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
         }
