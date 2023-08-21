@@ -228,4 +228,37 @@ class AuctionService
         $auction->current_bid = $data['bid'];
         $auction->save();
     }
+
+    public function getAuctions()
+    {
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+        } else {
+            throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+
+        $client = $user->client;
+
+        if (empty($client)) {
+            throw new Exception('Client not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $clientAuctions = ClientAuction::where('client_id', '=', $client->id)->get();
+
+        $auctions = [];
+
+        foreach ($clientAuctions as $clientAuction) {
+            $auction = Auction::findOrFail($clientAuction->auction_id);
+            $artwork = Artwork::findOrFail($auction->artwork_id);
+            $post = Post::where('artwork_id', $artwork->id)->first();
+            $client = Client::where('id', $auction->creator_id)->first();
+            $auction->image = $post->id;
+            $auction->artwork = $artwork;
+            $auction->post = $post;
+            $auction->client = $client;
+            $auctions[] = $auction;
+        }
+
+        return $auctions;
+    }
 }

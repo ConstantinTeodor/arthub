@@ -7,6 +7,7 @@ use App\Http\Requests\Auction\AuctionFilteredRequest;
 use App\Http\Requests\Auction\AuctionParticipateRequest;
 use App\Http\Requests\Auction\AuctionStoreRequest;
 use App\Http\Resources\Auction\AuctionFilteredResource;
+use App\Http\Resources\Auction\AuctionIndexResource;
 use App\Http\Resources\Auction\AuctionShowResource;
 use App\Services\AuctionService;
 use Exception;
@@ -88,6 +89,16 @@ class AuctionController extends Controller
             $validatedData = $request->validated();
             $this->auctionService->bid($validatedData);
             return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    public function index()
+    {
+        try {
+            $auctions = $this->auctionService->getAuctions();
+            return new AuctionIndexResource([ 'data' => $auctions ]);
         } catch (Exception $e) {
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
         }

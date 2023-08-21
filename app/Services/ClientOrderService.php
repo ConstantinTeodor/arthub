@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Artwork;
 use App\Models\ClientCart;
 use App\Models\ClientOrder;
 use App\Models\ClientOrderItem;
+use App\Models\Post;
 use App\Models\Sale;
 use App\Models\User;
 use Exception;
@@ -63,5 +65,37 @@ class ClientOrderService
                 ->delete();
 
         }
+    }
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public function getClientOrders(): mixed
+    {
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+        } else {
+            throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+
+        $client = $user->client;
+
+        if (empty($client)) {
+            throw new Exception('Client not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $clientOrders = ClientOrder::where('client_id', '=', $client->id)->get();
+
+        foreach ($clientOrders as $order) {
+            $order->client_order_items = ClientOrderItem::where('client_order_id', '=', $order->id)->get();
+            foreach ($order->client_order_items as $orderItem) {
+                $orderItem->artwork = Artwork::findOrFail($orderItem->artwork_id);
+                $post = Post::where('artwork_id', '=', $orderItem->artwork_id)->first();
+                $orderItem->image = $post->id;
+            }
+        }
+
+        return $clientOrders;
     }
 }

@@ -68,6 +68,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/{id}', [AuctionController::class, 'show']);
         Route::post('/participate', [AuctionController::class, 'participate']);
         Route::post('/bid', [AuctionController::class, 'bid']);
+        Route::get('/', [AuctionController::class, 'index']);
     });
 
     Route::prefix('sales')->group(function () {
@@ -86,6 +87,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
     Route::prefix('/orders')->group(function () {
         Route::post('/', [ClientOrderController::class, 'store']);
+        Route::get('/', [ClientOrderController::class, 'index']);
     });
 
     Route::prefix('genres')->group(function () {
