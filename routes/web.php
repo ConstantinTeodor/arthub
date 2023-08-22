@@ -38,6 +38,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/myAccount/myId', [ClientController::class, 'getMyId']);
         Route::get('/checkout/userdata', [ClientController::class, 'getCheckoutData']);
         Route::get('/search/{string}', [ClientController::class, 'search']);
+        Route::put('/', [ClientController::class, 'update']);
     });
 
     Route::prefix('artworks')->group(function () {
@@ -103,6 +104,7 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/status/{receiver_id}', [ConnectionController::class, 'status']);
         Route::delete('/{id}', [ConnectionController::class, 'destroy']);
         Route::put('/', [ConnectionController::class, 'update']);
+        Route::get('/', [ConnectionController::class, 'index']);
     });
 
     Route::prefix('notifications')->group(function () {

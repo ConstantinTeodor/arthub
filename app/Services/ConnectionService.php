@@ -10,7 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ControllerService
+class ConnectionService
 {
     public function __construct() {}
 
@@ -180,5 +180,36 @@ class ControllerService
                 ->where('receiver_id', '=', $client->id)
                 ->update(['status' => $data['status']]);
         }
+    }
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public function getConnections(): mixed
+    {
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+        } else {
+            throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+
+        $client = $user->client;
+
+        if (empty($client)) {
+            throw new Exception('Client not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $connections = Connection::where('requester_id', '=', $client->id)
+                    ->orWhere('receiver_id', '=', $client->id)
+                    ->where('status', '=', 'accepted')
+                    ->get();
+
+        foreach ($connections as $connection) {
+            $connectionClient = Client::findOrFail($connection->requester_id === $client->id ? $connection->receiver_id : $connection->requester_id);
+            $connection->client = $connectionClient;
+        }
+
+        return $connections;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Client\ClientStoreRequest;
+use App\Http\Requests\Client\ClientUpdateRequest;
 use App\Http\Resources\Client\ClientCheckoutResource;
 use App\Http\Resources\Client\ClientSearchResource;
 use App\Http\Resources\Client\ClientShowResource;
@@ -81,6 +82,21 @@ class ClientController extends Controller
         try {
             $clients = $this->clientService->search($query);
             return new ClientSearchResource(['data' => $clients]);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param ClientUpdateRequest $request
+     * @return JsonResponse
+     */
+    public function update(ClientUpdateRequest $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validated();
+            $this->clientService->updateClient($validatedData);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
         }

@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Connection\ConnectionStoreRequest;
 use App\Http\Requests\Connection\ConnectionUpdateRequest;
-use App\Services\ControllerService;
+use App\Http\Resources\Connection\ConnectionIndexResource;
+use App\Services\ConnectionService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -12,7 +13,7 @@ use Illuminate\Http\Response;
 class ConnectionController extends Controller
 {
     public function __construct(
-        protected ControllerService $controllerService
+        protected ConnectionService $controllerService
     )
     {
     }
@@ -71,6 +72,19 @@ class ConnectionController extends Controller
             $validatedData = $request->validated();
             $this->controllerService->updateConnection($validatedData);
             return response()->json(['message' => 'Success'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], $e->getCode());
+        }
+    }
+
+    /**
+     * @return ConnectionIndexResource|JsonResponse
+     */
+    public function index(): JsonResponse|ConnectionIndexResource
+    {
+        try {
+            $connections = $this->controllerService->getConnections();
+            return new ConnectionIndexResource($connections);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], $e->getCode());
         }
