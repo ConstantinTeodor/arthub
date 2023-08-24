@@ -6,7 +6,9 @@ use App\Http\Controllers\ClientCartController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientOrderController;
 use App\Http\Controllers\ConnectionController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SaleController;
@@ -112,4 +114,19 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/read', [NotificationController::class, 'markAsRead']);
         Route::post('/readAll', [NotificationController::class, 'readAll']);
     });
+
+    Route::prefix('conversations')->group(function () {
+        Route::get('/', [ConversationController::class, 'index']);
+        Route::put('/{id}', [ConversationController::class, 'update']);
+
+    });
+
+    Route::prefix('messages')->group(function () {
+        Route::get('/{id}', [MessageController::class, 'show']);
+        Route::post('/', [MessageController::class, 'store']);
+    });
 });
+
+Route::get('/verify-account/{token}', [ClientController::class, 'verifyAccount']);
+Route::get('/forgot-password/{string}', [UserController::class, 'forgotPassword']);
+Route::put('/user/reset', [UserController::class, 'updateRecoveryPassword']);

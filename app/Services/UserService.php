@@ -2,11 +2,17 @@
 
 namespace App\Services;
 
+use App\Mail\PasswordRecoveryMail;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -99,5 +105,62 @@ class UserService
         }
 
         throw new Exception('Invalid email or password', Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * @param string $email
+     * @return void
+     * @throws Exception
+     */
+    public function forgotPassword(string $email): void
+    {
+        $user = User::where('email', '=', $email)->first();
+
+        if (empty($user)) {
+            throw new Exception('Invalid email address', Response::HTTP_NOT_FOUND);
+        }
+
+        $token = Str::random(60);
+
+        DB::table('password_resets')->insert([
+            'user_id' => $user->id,
+            'reset_token' => $token,
+            'status' => 'pending',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
+        ]);
+
+        try {
+            Mail::to($user->email)->send(new PasswordRecoveryMail($token));
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    public function updateRecoveryPassword(array $data): void
+    {
+        $user = User::where('email', '=', $data['email'])->first();
+
+        if (!$user) {
+            throw new Exception('Invalid email address', Response::HTTP_NOT_FOUND);
+        }
+
+        $passwordErrors = $this->checkPassword($data['password']);
+
+        if (!empty($passwordErrors)) {
+            throw new Exception(implode('<br>', $passwordErrors), Response::HTTP_BAD_REQUEST);
+        }
+
+        $user->password = Hash::make($data['password']);
+        $user->save();
+
+        DB::table('password_resets')
+            ->where('user_id', $user->id)
+            ->update(['status' => 'used']);
     }
 }

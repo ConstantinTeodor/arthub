@@ -2,13 +2,17 @@
 
 namespace App\Services;
 
+use App\Mail\AccountConfirmationEmail;
 use App\Models\Client;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ClientService
 {
@@ -40,6 +44,27 @@ class ClientService
 
         $user->client_id = $client->id;
         $user->save();
+
+        $specialUrl = Str::random(60);
+
+        DB::table('account_verifications')
+            ->insert([
+                'user_id' => $user->id,
+                'verification_token' => $specialUrl,
+                'status' => 'pending',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+
+
+        $completeUrl = 'http://localhost:8000/verify-account/' . $specialUrl;
+
+        $clientName = $client->first_name . ' ' . $client->last_name;
+        try {
+            Mail::to($user->email)->send(new AccountConfirmationEmail($clientName , $completeUrl));
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -202,5 +227,34 @@ class ClientService
         }
 
         $user->save();
+    }
+
+    /**
+     * @param string $token
+     * @return void
+     * @throws Exception
+     */
+    public function verifyAccount(string $token): void
+    {
+        $verification = DB::table('account_verifications')
+            ->where('verification_token', '=', $token)
+            ->first();
+
+        if (empty($verification)) {
+            throw new Exception('Verification token not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $user = User::findOrFail($verification->user_id);
+
+        if (empty($user)) {
+            throw new Exception('User not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $user->verified = Carbon::now();
+        $user->save();
+
+        DB::table('account_verifications')
+            ->where('verification_token', '=', $token)
+            ->update(['status' => 'verified']);
     }
 }

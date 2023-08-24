@@ -101,4 +101,18 @@ class ClientController extends Controller
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
         }
     }
+
+    /**
+     * @param string $token
+     * @return JsonResponse
+     */
+    public function verifyAccount(string $token): JsonResponse
+    {
+        try {
+            $this->clientService->verifyAccount($token);
+            return response()->json([ 'Thank you! Your account is now verified!' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
 }

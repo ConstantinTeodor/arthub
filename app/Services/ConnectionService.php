@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Client;
 use App\Models\Connection;
+use App\Models\Conversation;
+use App\Models\Notification;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Response;
@@ -179,6 +181,24 @@ class ConnectionService
                 ->where('requester_id', '=', $data['receiver_id'])
                 ->where('receiver_id', '=', $client->id)
                 ->update(['status' => $data['status']]);
+
+
+
+            $notification = new Notification();
+            $notification->client_id = $data['receiver_id'];
+            $notification->title = "Connection Request Accepted";
+            $notification->message = "Your connection request to " . $client->first_name . ' ' . $client->last_name . " has been accepted";
+            $notification->from_id = $client->id;
+            $notification->save();
+
+            $conversation = new Conversation();
+            $conversation->name = 'New conversation!';
+            $conversation->save();
+
+            $conversation->clients()->attach($client->id);
+            $conversation->clients()->attach($data['receiver_id']);
+
+            $conversation->save();
         }
     }
 

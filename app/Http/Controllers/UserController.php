@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\UserLoginRequest;
+use App\Http\Requests\User\UserRecoveryUpdateRequest;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Services\ClientService;
 use App\Services\UserService;
@@ -55,5 +56,34 @@ class UserController extends Controller
     {
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+    }
+
+    /**
+     * @param string $email
+     * @return JsonResponse
+     */
+    public function forgotPassword(string $email): JsonResponse
+    {
+        try {
+            $this->userService->forgotPassword($email);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param UserRecoveryUpdateRequest $request
+     * @return JsonResponse
+     */
+    public function updateRecoveryPassword(UserRecoveryUpdateRequest $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validated();
+            $this->userService->updateRecoveryPassword($validatedData);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
     }
 }

@@ -50,4 +50,9 @@ class Client extends Model
     {
         return $this->hasMany(ClientOrder::class, 'client_id', 'id');
     }
+
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_client', 'client_id', 'conversation_id');
+    }
 }

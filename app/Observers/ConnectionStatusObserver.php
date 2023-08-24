@@ -4,7 +4,9 @@ namespace App\Observers;
 
 use App\Models\Client;
 use App\Models\Connection;
+use App\Models\Conversation;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Log;
 
 class ConnectionStatusObserver
 {
@@ -34,6 +36,7 @@ class ConnectionStatusObserver
      */
     public function updated(Connection $connectionRequest): void
     {
+        Log::debug("Connection status updated");
         if ($connectionRequest->isDirty('status')) {
             if ($connectionRequest->status == "accepted") {
                 $from = Client::findOrfail($connectionRequest->receiver_id);
@@ -44,8 +47,16 @@ class ConnectionStatusObserver
                 $notification->message = "Your connection request to " . $from->first_name . ' ' . $from->last_name . " has been accepted";
                 $notification->from_id = $connectionRequest->receiver_id;
                 $notification->save();
+
+                $conversation = new Conversation();
+                $conversation->name = 'New conversation!';
+                $conversation->save();
+
+                $conversation->clients()->attach($connectionRequest->requester_id);
+                $conversation->clients()->attach($connectionRequest->receiver_id);
+
+                $conversation->save();
             }
         }
     }
-
 }
