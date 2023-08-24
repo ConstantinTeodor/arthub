@@ -30,6 +30,7 @@ class ClientOrder extends Model
 
     public function items(): BelongsToMany
     {
-        return $this->belongsToMany(Artwork::class, 'client_order_items', 'client_order_id', 'artwork_id');
+        return $this->belongsToMany(Artwork::class, 'client_order_items', 'client_order_id', 'artwork_id')
+            ->withPivot('quantity', 'total_amount');
     }
 }
