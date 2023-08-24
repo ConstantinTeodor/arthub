@@ -55,4 +55,9 @@ class Client extends Model
     {
         return $this->belongsToMany(Conversation::class, 'conversation_client', 'client_id', 'conversation_id');
     }
+
+    public function connections(): BelongsToMany
+    {
+        return $this->belongsToMany(Client::class, 'connections', 'requester_id', 'receiver_id');
+    }
 }
