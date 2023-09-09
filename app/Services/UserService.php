@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Mail\ContactMail;
 use App\Mail\PasswordRecoveryMail;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -162,5 +164,25 @@ class UserService
         DB::table('password_resets')
             ->where('user_id', $user->id)
             ->update(['status' => 'used']);
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    public function contact(array $data): void
+    {
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+        } else {
+            throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+
+        try {
+            Mail::to('arthub.2023@hotmail.com')->send(new ContactMail($data['message'], $user->email));
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

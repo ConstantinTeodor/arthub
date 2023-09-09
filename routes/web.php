@@ -125,6 +125,8 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/{id}', [MessageController::class, 'show']);
         Route::post('/', [MessageController::class, 'store']);
     });
+
+    Route::post('/contact', [UserController::class, 'contact']);
 });
 
 Route::get('/verify-account/{token}', [ClientController::class, 'verifyAccount']);

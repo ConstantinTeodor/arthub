@@ -17,6 +17,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AuctionService
 {
@@ -101,9 +102,15 @@ class AuctionService
         }
 
         foreach ($result as $artwork) {
-            $post = Post::where('artwork_id', $artwork->artwork_id)->first();
+            Log::debug('started', [$artwork]);
+            $post = Post::where('artwork_id', $artwork->artwork_id)->where('deleted_at', '=', null)->first();
             $artwork->image = $post->id;
+
+            Log::debug('artwork', [$artwork]);
+
             $client = Client::where('id', $artwork->creator_id)->first();
+
+            Log::debug('client', [$client]);
             $artwork->client = $client;
         }
 

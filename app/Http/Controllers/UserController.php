@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\User\UserContactRequest;
 use App\Http\Requests\User\UserLoginRequest;
 use App\Http\Requests\User\UserRecoveryUpdateRequest;
 use App\Http\Requests\User\UserStoreRequest;
@@ -81,6 +82,21 @@ class UserController extends Controller
         try {
             $validatedData = $request->validated();
             $this->userService->updateRecoveryPassword($validatedData);
+            return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
+        }
+    }
+
+    /**
+     * @param UserContactRequest $request
+     * @return JsonResponse
+     */
+    public function contact(UserContactRequest $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validated();
+            $this->userService->contact($validatedData);
             return response()->json([ 'message' => 'Success' ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([ 'message' => $e->getMessage() ], $e->getCode());
